@@ -1,20 +1,19 @@
 package scode.springscode.post.controller.request;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDate;
-
 
 @Getter
 @RequiredArgsConstructor
 public class PostUpdateRequest {
 
+    @NotEmpty
     private String author;
 
-    private LocalDate createDate;
-
+    @NotEmpty
     private String title;
 
+    @NotEmpty
     private String body;
 }

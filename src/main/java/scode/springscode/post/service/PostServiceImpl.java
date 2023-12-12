@@ -1,27 +1,31 @@
 package scode.springscode.post.service;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scode.springscode.post.controller.request.PostRequest;
 import scode.springscode.post.controller.request.PostUpdateRequest;
+import scode.springscode.post.dto.PostDto;
+import scode.springscode.post.dto.PostMapperDto;
 import scode.springscode.post.entity.Post;
 import scode.springscode.post.repository.JpaPostRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService{
 
-    JpaPostRepository postRepository;
-
+    private final JpaPostRepository postRepository;
+    private final PostMapperDto mapper;
     @Override
     @Transactional
-    public void create(PostRequest postRequest) {
+    public PostDto write(PostRequest postRequest , HttpSession session) {
+
         if (postRequest == null) {
             throw new RuntimeException("입력한 값이 없습니다.");
         }
@@ -33,6 +37,8 @@ public class PostServiceImpl implements PostService{
                 .body(postRequest.getBody()).build();
 
         postRepository.save(posts);
+
+        return mapper.apply(posts);
     }
 
     @Override
@@ -62,10 +68,13 @@ public class PostServiceImpl implements PostService{
 
     @Override
     @Transactional(readOnly = true)
-    public Post singleQuery(String findName) {
-        return postRepository
+    public PostDto singleQuery(final String findName) {
+
+        Post post = postRepository
                 .findByTitle(findName)
                 .orElseThrow(() -> new RuntimeException(""));
+
+        return mapper.apply(post);
 
     }
 
